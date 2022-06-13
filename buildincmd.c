@@ -29,12 +29,23 @@ int main(void) {
         char *args[MAXARGS + 1] = { NULL };
         int wstatus;
 
+
         // prompt
-        printf("%s ", getuid() == 0 ? "#" : "$");
+        //printf("%s ", getuid() == ' '? "#" : "$");
         fgets(input, PRMTSIZ, stdin);
 
         // ignore empty input
         if (*ptr == '\n') continue;
+
+        //setting PATH
+        static int first_time = 1;
+        if (first_time)                  //clear screen for the first time
+        {
+            const char* CLEAR_SCREEN_ANSI = "\e[1; 1H\e[2j";
+            write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
+            first_time = 0;
+        }
+        printf("#");    // this command will display prompt
 
         // convert input line to list of arguments
         for (int i = 0; i < sizeof(args) && *ptr; ptr++) {
