@@ -9,7 +9,7 @@
 #define EXITCMD "exit"
 
 
-int main(void) {
+int main() {
 
     printf("\n\n\n\n******************"
         "************************");
