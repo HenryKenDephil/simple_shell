@@ -1,86 +1,136 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
- #include <sys/types.h>
+#include "main.h"
 
-void type_prompt()
+/**
+  * check_path - checks if path with command exists
+  *
+  * @str: string to add to path
+  * Return: the path if valid, NULL otherwise
+  */
+char *check_path(char *str)
 {
-    static int first_time = 1;
-    if (first_time)                  //clear screen for the first time
-    {
-        const char* CLEAR_SCREEN_ANSI = "\e[1; 1H\e[2j";
-        write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
-        first_time = 0;
-    }
-    printf("#");    // this command will display prompt
+	char **pathlist = NULL;
+	char *full_cmd = NULL;
+	int i;
+
+	pathlist = build_path(_getenv("PATH"));
+
+	for (i = 0; pathlist[i]; i++)
+	{
+		full_cmd = _strcat_dir(pathlist[i], str);
+		if (access(full_cmd, F_OK))
+			free(full_cmd);
+		else
+			break;
+	}
+	if (!pathlist[i])
+	{
+		free_double(pathlist);
+		return (str);
+	}
+	if (pathlist)
+		free_double(pathlist);
+	return (full_cmd);
 }
 
-void read_command ( char cmd[], char *par[])
+/**
+  * main - runs the shell
+  *
+  * @argc: number of arguments
+  * @argv: array of arguments (strings)
+  * Return: 0
+  */
+int main(int argc, char *const argv[])
 {
-    char line [1024];
-    int count = 0, i = 0, j = 0;
-    char *array [100], *pch;
-    
-    // read one line
-    for (;; )
-    {
-        int c = fgetc (stdin);
-        line[count++] = (char) c;
-        if (c == '\n')
-        {
-            break;
-        }
-    }
-    if ( count == 1)
-    {
-        return;
-    }
-    pch = strtok ( line, "\n");
+	char **arglist = NULL;
+	char *full_cmd = NULL;
+	pid_t my_pid;
+	int status = 0, isinteractive = 0;
+	char ret_code = -1;
+	(void)argv;
 
-    // parse the line into words
+	isinteractive = isatty(STDIN_FILENO);
+	while (argc)
+	{
+		arglist = arg_list(isinteractive);
+		ret_code = builtin_finder(arglist);
 
-    while (pch != NULL)
-    {
-        array[i++] = strdup (pch);
-        pch = strtok (NULL, "\n");
-    }
-
-    // first word is the command
-
-    strcpy ( cmd, array [0]);
-    // others are parameters
-    for (int j=0; j<i; j++)
-    {
-        par[j] = array[j];
-    }
-    par[i] = NULL;  // NULL terminates the parameter list  
+		if (ret_code >= 0)
+			exit(ret_code);
+		my_pid = fork();
+		if (my_pid == -1)
+		{
+			error_call(0, "fork failed", arglist);
+			return (1);
+		}
+		if (my_pid == 0 && ret_code == -1 && arglist)
+		{
+			if (*arglist[NON_BUILTIN] != '/')
+			{
+				full_cmd = check_path(arglist[NON_BUILTIN]);
+				if (full_cmd && execve(full_cmd, arglist, NULL) == -1)
+					error_call(0, full_cmd, arglist);
+			}
+			else if (execve(arglist[NON_BUILTIN], arglist, NULL) == -1)
+			{
+				error_call(0, "not found", arglist);
+			}
+		}
+		if (wait(&status) == -1) /* if child failed */
+			_exit(status);
+		if (arglist && ret_code == -1)
+			free_double(arglist);
+	}
+	return (0);
 }
 
-int main()
+/**
+  * arg_list - obtains an argument list from the getline
+  *
+  * @isinteractive: a flag to indicate interactive mode
+  * Return: an array of strings that contain the arguments
+  */
+char **arg_list(int isinteractive)
 {
-    char cmd[100], command[100], *parameters[20];  // creating environment variable
-    char *envp[] = {(char *) "PATH=/bin", 0};
-    while ( 1 )                  // continouos iteration or looping forever
-    {
-        type_prompt();           //command to display prompt on screen
-        read_command( command, parameters);   // command to read input from terminal
-        if (fork() != 0)              // this is parent command
-        {
-            wait (NULL);             // this is wait for child
-        }
-        else
-        {
-            strcpy( cmd, "/bin/");
-            strcat( cmd, command);
-            execve( cmd, parameters, envp);    //this is an execute command
-        }
-        if ( strcmp ( command, "exit") == 0)
-        {
-            break;
-        }
-    }
-    return 0;
+	char **arglist;
+	char *buf = NULL;
+	int i;
+	size_t size_b = 0;
+
+	if (isinteractive)
+		print_str("#cisfun$ ");
+
+	i = getline(&buf, &size_b, stdin);
+	if (i == -1)
+	{
+		if (isinteractive)
+			write(STDOUT_FILENO, "\n", 1);
+		free(buf);
+		return (arglist = strtow("exit", ' '));
+	}
+	*(buf + i - 1) = '\0';
+
+	arglist = strtow(buf, ' ');
+	i = 0;
+
+	free(buf);
+
+	return (arglist);
 }
 
+/**
+  * error_call - function for freeing and returning an error
+  *
+  * @n: integer in case of specific exit number
+  * @err: string to print out for error
+  * @arglist: the arguments to free in case of exits
+  * Return: n on success
+  */
+int error_call(int n, char *err, char **arglist)
+{
+	perror(err);
+	free_double(arglist);
+	return (n);
+}

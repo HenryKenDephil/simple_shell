@@ -1,70 +1,54 @@
-#include <unistd.h>
+#include "main.h"
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <sys/wait.h>
-
-#define PRMTSIZ 255
-#define MAXARGS 63
-#define EXITCMD "exit"
-
-
-int main() {
-
-    printf("\n\n\n\n******************"
-        "************************");
-    printf("\n\n\n\t****MY SHELL****");
-    printf("\n\n\t-IT HAS LIMITED FUNCTIONS-");
-    printf("\n\n\n\n*******************"
-        "***********************");
-    char* username = getenv("USER");
-    printf("\n\n\nUSER is: @%s", username);
-    printf("\n");
-    sleep(1);
-    
-
-    for (;;) {
-        char input[PRMTSIZ + 1] = { 0x0 };
-        char *ptr = input;
-        char *args[MAXARGS + 1] = { NULL };
-        int wstatus;
+#include <unistd.h>
+#include <string.h>
+ #include <sys/types.h>
+ #include <signal.h>
 
 
-        // prompt
-        //printf("%s ", getuid() == ' '? "#" : "$");
-        fgets(input, PRMTSIZ, stdin);
+/**
+  * exit_builtin - built in function to exit shell
+  *
+  * @arglist: arguments list
+  * @envp: environment variables
+  * Return: returns -1 to signal exit
+  */
+char exit_builtin(char **arglist, char **envp)
+{
+	int i = 0;
+	(void)envp;
 
-        // ignore empty input
-        if (*ptr == '\n') continue;
+	if (arglist && arglist[1])
+	{
+		i = _atoi(arglist[1]);
+		if (i <= 0)
+		{
+			i = -99;
+			write(STDOUT_FILENO, "illegal number\n", 15);
+		}
+	}
 
-        //setting PATH
-        static int first_time = 1;
-        if (first_time)                  //clear screen for the first time
-        {
-            const char* CLEAR_SCREEN_ANSI = "\e[1; 1H\e[2j";
-            write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
-            first_time = 0;
-        }
-        printf("#");    // this command will display prompt
+	if (arglist)
+		free_double(arglist);
 
-        // convert input line to list of arguments
-        for (int i = 0; i < sizeof(args) && *ptr; ptr++) {
-            if (*ptr == ' ') continue;
-            if (*ptr == '\n') break;
-            for (args[i++] = ptr; *ptr && *ptr != ' ' && *ptr != '\n'; ptr++);
-            *ptr = '\0';
-        }
+	return (i);
+}
 
-        // built-in: exit
-        if (strcmp(EXITCMD, args[0]) == 0) return 0;
+/**
+  * env_builtin - built in for printing the environment variables
+  *
+  * @arglist: arguments list
+  * @envp: environment variables
+  * Return: -2 to indicate non exit, but found builtin
+  */
+char env_builtin(char **arglist, char **envp)
+{
+	print_env(envp);
 
-        // fork child and execute program
-        signal(SIGINT, SIG_DFL);
-        if (fork() == 0) exit(execvp(args[0], args));
-        signal(SIGINT, SIG_IGN);
+	if (arglist)
+		free_double(arglist);
 
-        // wait for program to finish and print exit status
-        wait(&wstatus);
-        if (WIFEXITED(wstatus)) printf("<%d>", WEXITSTATUS(wstatus));
-    }
+	return (-2);
 }
