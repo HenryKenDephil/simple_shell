@@ -1,4 +1,4 @@
-this is simple shell project. The group created this own shell to test the shell scripting skills.
+this is simple shell project. The simple shell is replica of the unix-like commandline shell.though it has limited functions, it performs the available commands just like the linux command line.
 List of allowed functions and system calls
 access (man 2 access)
 chdir (man 2 chdir)
