@@ -1,64 +1,44 @@
-#ifndef _MAIN_H_
-#define _MAIN_H_
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#ifndef HEADER_FILE
+#define HEADER_FILE
+
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <sys/wait.h>
-#include <signal.h>
-#include <errno.h>
-
-#define EXIT_BUILTIN 1
-#define NON_BUILTIN 0
-
-extern char **environ;
-
-extern int errno;
 
 /**
-  * struct built_in - struct for matching commands to built in commands
-  * @command: the string matching the command to execute
-  * @built_cmd: the built in command to call if command matches
-  * Description: Special built in commands for custom shell
-  */
+ * struct built_in - struct built_in
+ * @cmd: The command
+ * @f: built-in function
+ */
 typedef struct built_in
 {
-	char *command;
-	char (*built_cmd)(char **, char **);
-} do_built;
+	char *cmd;
+	int (*f)(char **args, char **splitPath, char *string);
+} built_in;
 
-char *check_path(char *);
-char **arg_list(int);
-int error_call(int, char *, char **);
+extern char **environ;
+char *_getenv(const char *name);
+char *_strstr(char *haystack, const char *needle);
+char *_strcat(char *s1, char *s2);
+int _strcmp(const char *s1, const char *s2);
+char *_strstr(char *haystack, const char *needle);
+int print_env(char **args, char **splitPath, char *string);
+int _strlen(const char *s);
+char *check_path(char *firstArg, char **splitPath);
+int execute_arg(char **args, char **splitPath, char *string);
+char *read_line(char **splitPath);
+char **split_str(char *input, char *delimiter);
+int _putchar(char c);
+void handler(int num);
+int exit_terminal(char **args, char **splitPath, char *string);
+int _atoi(char *c);
+int _isdigit(int c);
+int check_built_in(char **args, char **splitPath, char *string);
+int _puts(const char *string);
 
-/* free */
-void free_double(char **);
-
-/* strtow */
-char **strtow(char *, char);
-int word_counter(char *, char);
-char *_malloc(int n, char **);
-
-/* Built in */
-char exit_builtin(char **, char **);
-char env_builtin(char **, char **);
-
-/* Utility */
-int _strlen(char *);
-int _strcmp(char *, char *);
-char *_strcat_dir(char *, char *);
-int _atoi(char *);
-
-/* Path */
-char **build_path(char *);
-void print_dir(char *);
-void print_env(char **);
-char *_getenv(char *);
-char *cut_env(char *);
-
-/* prompt */
-int print_str(char *);
-int builtin_finder(char **);
-
-#endif /*_MAIN_H_*/
-
+#endif

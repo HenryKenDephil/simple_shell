@@ -1,0 +1,46 @@
+.\" Manpage for simple_shell
+.\" Contact Youssef Jellouli or Ahmed Elzowawi in to correct errors or typos.
+.TH man 1 "7 April 2022" "1.0" "simple_shell man 1 page"
+.SH NAME
+.B hsh
+- Command Line Interpreter
+.SH SYNOPSIS
+.B ./hsh
+.SH DESCRIPTION
+hsh is a command language interpreter that executes commands read from a command line string or the standard input.
+
+.B • Interactive mode
+
+The commands are run by user input.
+Ex: the shell can prompt the user to enter input.
+
+.B • Non-interactive mode
+
+The comands are run via piping.
+Ex: echo "ls" | ./hsh
+
+.SH EXAMPLE
+
+~/simple_shell$ ./hsh
+
+($) ls
+
+README.md  _getenv.c  check_path.c  execute_arg.c  hsh  main.c  main.h
+
+print_env.c  read_line.c  signal_handler.c  split_str.c  strUtils.c
+
+($) exit
+
+~/simple_shell$
+
+.SH ENVIRONMENT
+
+.B • PATH
+
+The default search path for executables.
+
+.SH BUGS
+No known bugs.
+
+.SH AUTHORS
+Youssef Jellouli & Ahmed Elzowawi
