@@ -4,6 +4,7 @@
  * @input: string input from read_line
  * @delimiter: delimit the string input
  * Return: Array of elements to execute
+ * 
  */
 char **split_str(char *input, char *delimiter)
 {

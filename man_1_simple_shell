@@ -21,6 +21,7 @@ Ex: echo "ls" | ./hsh
 
 .SH EXAMPLE
 
+
 ~/simple_shell$ ./hsh
 
 ($) ls

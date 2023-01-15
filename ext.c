@@ -5,6 +5,7 @@
  * @splitPath: path value
  * @string: string input from read_line
  * Return: 0
+ * 
  */
 int exit_terminal(char **args, char **splitPath, char *string)
 {

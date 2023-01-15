@@ -6,7 +6,7 @@
 
 /**
   * print_str - prints a string to standard out
-  *
+  * 
   * @str: string to write out
   * Return: int of how many chars written
   */

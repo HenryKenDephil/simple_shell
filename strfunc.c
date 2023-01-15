@@ -5,6 +5,7 @@
  * @str: string to write
  *
  * Return: number of chars printed or -1 on failure
+ * 
  */
 ssize_t _puts(char *str)
 {

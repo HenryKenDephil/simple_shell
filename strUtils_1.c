@@ -3,6 +3,7 @@
  * _isdigit - check if c is an integer
  * @c: integer
  * Return: 0
+ * 
  */
 
 int _isdigit(int c)

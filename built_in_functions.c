@@ -5,6 +5,7 @@
  * @splitPath: path value
  * @string: string input from read_line
  * Return: return value from the specified function
+ * 
  */
 int check_built_in(char **args, char **splitPath, char *string)
 {

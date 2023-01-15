@@ -4,6 +4,7 @@
  * handler - Handles SIGINT signal
  * @UNUSEDVAR: unused integer
  * Return: void
+ * 
  */
 void handler(int num UNUSEDVAR)
 {

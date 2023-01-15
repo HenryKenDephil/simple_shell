@@ -4,7 +4,6 @@
  * print_error - prints error messages to standard error
  * @vars: pointer to struct of variables
  * @msg: message to print out
- *
  * Return: void
  */
 void print_error(vars_t *vars, char *msg)

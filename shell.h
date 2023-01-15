@@ -21,6 +21,7 @@
  * @argv: arguments at opening of shell
  * @status: exit status
  * @commands: double pointer to commands
+ * 
  */
 typedef struct variables
 {

@@ -4,6 +4,7 @@
  * @firstArg: argument to execute
  * @splitPath: path value
  * Return: Executable argument
+ * 
  */
 char *check_path(char *firstArg, char **splitPath)
 {

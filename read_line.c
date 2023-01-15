@@ -3,6 +3,7 @@
  * read_line - reads line from input
  * @splitPath: path value
  * Return: string
+ * 
  */
 char *read_line(char **splitPath)
 {
