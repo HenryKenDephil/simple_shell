@@ -1,21 +1,19 @@
 #include "main.h"
-#define UNUSEDVAR __attribute__((unused))
+
 /**
- * print_env - prints environment
- * @UNUSEDVAR: unused args
- * Return: none
- * 
- */
-
-int print_env(char **args UNUSEDVAR, char **splitPath UNUSEDVAR,
-			  char *string UNUSEDVAR)
+* print_env - prints the environment string to stdout
+*
+* Return: 0
+*/
+void print_env(void)
 {
-	int i = 0;
+	int x = 0;
+	char **env = environ;
 
-	while (environ[i])
+	while (env[x])
 	{
-		_puts(environ[i++]);
-		_putchar('\n');
+		write(STDOUT_FILENO, (const void *)env[x], _strlen(env[x]));
+		write(STDOUT_FILENO, "\n", 1);
+		x++;
 	}
-	return (1);
 }
